@@ -94,7 +94,7 @@ defmodule DemoUtil do
   #   }/listKeys?api-version=2019-04-01"
   #   |> Porcelain.shell()
   #   |> Map.fetch!(:out)
-  #   |> Poison.decode!()
+  #   |> Jason.decode!()
   #   |> Map.fetch!("keys")
   #   |> Enum.map(&(&1 |> Map.fetch!("value")))
   # end
@@ -110,7 +110,7 @@ defmodule DemoUtil do
   #     # |> Kernel.to_charlist() |> :os.cmd() |> Kernel.to_string()
   #     |> Porcelain.shell()
   #     |> Map.fetch!(:out)
-  #     |> Poison.decode!()
+  #     |> Jason.decode!()
 
   #   %{
   #     accessToken: accessToken,

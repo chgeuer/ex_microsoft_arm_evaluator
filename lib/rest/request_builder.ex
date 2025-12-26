@@ -11,17 +11,19 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.REST.RequestBuilder do
 
     token = uri |> trim_uri_for_aad_request() |> aad_token_provider.()
 
-    new_request()
-    |> method(method)
-    |> url(uri)
-    # |> add_param(:query, :comp, "lease")
-    # |> add_header("x-ms-lease-action", "acquire")
-    |> add_header("Authorization", "Bearer #{token}")
-    |> remove_empty_headers()
-    |> add_missing(:query, [])
-    |> Enum.into([])
+    opts =
+      new_request()
+      |> method(method)
+      |> url(uri)
+      # |> add_param(:query, :comp, "lease")
+      # |> add_header("x-ms-lease-action", "acquire")
+      |> add_header("Authorization", "Bearer #{token}")
+      |> remove_empty_headers()
+      |> add_missing(:query, [])
+      |> Enum.into([])
+
     # |> IO.inspect(label: :RESTClientRequest)
-    |> (&RestClient.request(connection, &1)).()
+    Req.request!(connection, opts)
     |> create_success_response()
 
     # |> IO.inspect(label: :RESTClientResponse)
@@ -36,7 +38,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.REST.RequestBuilder do
     |> copy_response_headers_into_map()
     |> copy_x_ms_meta_headers_into_map()
     |> (fn response = %{body: body} ->
-          case body |> Poison.decode() do
+          case body |> Jason.decode() do
             {:ok, json} -> response |> Map.put(:body, json)
             _ -> response
           end
@@ -101,23 +103,15 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.REST.RequestBuilder do
   def add_param(request, :body, :body, value), do: request |> Map.put(:body, value)
 
   def add_param(request, :body, key, value) do
+    # Req handles JSON encoding automatically with the json option
     request
-    |> Map.put_new_lazy(:body, &Tesla.Multipart.new/0)
-    |> Map.update!(
-      :body,
-      &Tesla.Multipart.add_field(
-        &1,
-        key,
-        Poison.encode!(value),
-        headers: [{:"Content-Type", "application/json"}]
-      )
-    )
+    |> Map.put(:json, %{key => value})
   end
 
   def add_param(request, :file, name, path) do
+    # Req uses multipart forms differently
     request
-    |> Map.put_new_lazy(:body, &Tesla.Multipart.new/0)
-    |> Map.update!(:body, &(&1 |> Tesla.Multipart.add_file(path, name: name)))
+    |> Map.put(:form, [{name, File.read!(path)}])
   end
 
   def add_param(request, :form, name, value) do
@@ -193,10 +187,10 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.REST.RequestBuilder do
     end
   end
 
-  def decode(%Tesla.Env{status: 200, body: body}), do: Poison.decode(body)
+  def decode(%{status: 200, body: body}), do: Jason.decode(body)
   def decode(response), do: {:error, response}
-  def decode(%Tesla.Env{status: 200} = env, false), do: {:ok, env}
-  def decode(%Tesla.Env{status: 200, body: body}, struct), do: Poison.decode(body, as: struct)
+  def decode(%{status: 200} = env, false), do: {:ok, env}
+  def decode(%{status: 200, body: body}, struct), do: Jason.decode(body, as: struct)
   def decode(response, _struct), do: {:error, response}
 
   def identity(x), do: x

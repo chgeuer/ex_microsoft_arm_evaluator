@@ -1,3 +1,1 @@
-use Mix.Config
-
-config :tesla, :adapter, :ibrowse
+import Config

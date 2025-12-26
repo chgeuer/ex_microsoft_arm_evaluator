@@ -5,7 +5,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.TemplateParameters do
 
   def parse_parameters_file_content(s) when is_binary(s) do
     s
-    |> Poison.decode!()
+    |> Jason.decode!()
     |> get_in(["parameters"])
     |> Enum.map(fn {k, %{"value" => v}} -> {k, v} end)
     |> Enum.into(%{})

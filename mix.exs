@@ -21,24 +21,20 @@ defmodule Microsoft.ARM.Evaluator.MixProject do
 
   def application do
     [
-      applications: [:tesla, :ibrowse],
       extra_applications: [:logger]
     ]
   end
 
   defp deps do
     [
-      {:nimble_parsec, "~> 0.5.1"},
-      {:poison, ">= 1.0.0"},
+      {:nimble_parsec, "~> 1.0"},
+      {:jason, "~> 1.4"},
       {:exdatauri, "~> 0.2.0"},
       {:uuid, "~> 1.1"},
-      {:timex, "~> 3.6"},
-      # needed for `mix test`
-      {:tzdata, "~> 0.1.8", override: true},
-      {:accessible, "~> 0.2.1"},
-      {:file_system, "~> 0.2.7"},
-      {:ibrowse, "~> 4.4"},
-      {:tesla, "~> 0.8"},
+      {:timex, "~> 3.7"},
+      {:accessible, "~> 0.3.0"},
+      {:file_system, "~> 1.0"},
+      {:req, "~> 0.5"},
       {:ex_microsoft_azure_utils, github: "chgeuer/ex_microsoft_azure_utils"}
     ]
   end

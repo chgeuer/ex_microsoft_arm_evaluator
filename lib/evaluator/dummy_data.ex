@@ -4,7 +4,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.Evaluator.DummyData do
   @external_resource Path.join([__DIR__, "dummy_data.json"])
 
   with {:ok, body} <- File.read(Path.join([__DIR__, "dummy_data.json"])),
-       {:ok, json} <- Poison.decode(body) do
+       {:ok, json} <- Jason.decode(body) do
     Enum.each(json, fn {provider, result} ->
       @provider provider
       @result result

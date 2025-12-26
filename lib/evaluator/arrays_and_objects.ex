@@ -75,7 +75,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.Evaluator.ArraysAndObjects
   def intersection(_), do: {:error, :unsupported_args}
 
   def json([s]) when is_binary(s) do
-    case s |> Poison.decode() do
+    case s |> Jason.decode() do
       {:ok, result} -> result
       _ -> {:error, :json_parse_error}
     end

@@ -457,7 +457,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.JSONParser do
   defp surrounded(v, s1, s2), do: "#{ws(s1)}#{v}#{ws(s2)}"
 
   defp poison_encode(value) do
-    case value |> Poison.encode() do
+    case value |> Jason.encode() do
       {:ok, v} -> v
       error -> error |> IO.inspect(label: :problem)
     end

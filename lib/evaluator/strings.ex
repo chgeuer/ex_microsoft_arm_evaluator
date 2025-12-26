@@ -15,7 +15,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.Evaluator.Strings do
   #
   def base64ToJson([val]) do
     with {:ok, base64decoded} <- Base.decode64(val),
-         {:ok, result} <- Poison.decode(base64decoded) do
+         {:ok, result} <- Jason.decode(base64decoded) do
       result
     else
       err -> err
@@ -72,7 +72,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.Evaluator.Strings do
   def format(_), do: {:error, :not_implemented}
 
   def guid(args) do
-    with {:ok, s} <- Poison.encode(args) do
+    with {:ok, s} <- Jason.encode(args) do
       UUID.uuid5(nil, s)
     else
       err -> err
@@ -141,7 +141,7 @@ defmodule Microsoft.Azure.TemplateLanguageExpressions.Evaluator.Strings do
   # https://hexdocs.pm/timex/Timex.Format.DateTime.Formatters.Default.html
   # Timex.now() |> Timex.format!("{YYYY}-{0M}-{0D}T{0h24}:{0m}:{0s}Z")
 
-  def string([val]), do: val |> JSONParser.to_elixir() |> Poison.encode!()
+  def string([val]), do: val |> JSONParser.to_elixir() |> Jason.encode!()
   def substring([val, start, len]) when is_binary(val), do: val |> String.slice(start, len)
 
   def take([val, numberToTake]) when is_binary(val) and is_integer(numberToTake),
